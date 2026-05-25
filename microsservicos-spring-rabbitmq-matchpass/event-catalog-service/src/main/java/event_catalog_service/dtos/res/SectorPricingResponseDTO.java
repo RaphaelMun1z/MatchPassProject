@@ -7,6 +7,7 @@ public record SectorPricingResponseDTO(
     UUID sectorId,
     String sectorName,
     BigDecimal basePrice,
+    BigDecimal halfPrice,
     Boolean hasNumberedSeats
 ) {
 }

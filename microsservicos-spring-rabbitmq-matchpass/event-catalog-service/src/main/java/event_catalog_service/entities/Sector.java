@@ -1,11 +1,9 @@
 package event_catalog_service.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -30,16 +28,28 @@ public class Sector {
     private Integer capacity;
 
     @NotNull
+    @PositiveOrZero(message = "O valor base do ingresso deve ser maior ou igual a zero")
+    @Column(nullable = false)
+    private BigDecimal basePrice;
+
+    @NotNull
+    @PositiveOrZero(message = "O valor do meio ingresso deve ser maior ou igual a zero")
+    @Column(nullable = false)
+    private BigDecimal halfPrice;
+
+    @NotNull
     @Column(name = "has_numbered_seats", nullable = false)
     private Boolean hasNumberedSeats;
 
     protected Sector() {
     }
 
-    public Sector(Venue venue, String name, Integer capacity, Boolean hasNumberedSeats) {
+    public Sector(Venue venue, String name, Integer capacity, BigDecimal basePrice, BigDecimal halfPrice, Boolean hasNumberedSeats) {
         this.venue = venue;
         this.name = name;
         this.capacity = capacity;
+        this.basePrice = basePrice;
+        this.halfPrice = halfPrice;
         this.hasNumberedSeats = hasNumberedSeats;
     }
 
@@ -57,6 +67,14 @@ public class Sector {
 
     public Integer getCapacity() {
         return capacity;
+    }
+
+    public BigDecimal getBasePrice() {
+        return basePrice;
+    }
+
+    public BigDecimal getHalfPrice() {
+        return halfPrice;
     }
 
     public Boolean getHasNumberedSeats() {
