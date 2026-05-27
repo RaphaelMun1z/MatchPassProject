@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record EventSummaryResponseDTO(
-    UUID eventId,
+    String eventId,
     String title,
     LocalDateTime eventDate,
     String venueName,

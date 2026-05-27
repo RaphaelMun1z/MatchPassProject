@@ -15,7 +15,7 @@ import java.util.*;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @NotBlank(message = "O título do evento não pode estar em branco")
     @Size(min = 5, max = 150, message = "O título deve ter entre 5 e 150 caracteres")
@@ -34,15 +34,15 @@ public class Event {
 
     @NotNull
     @Column(name = "venue_id", nullable = false)
-    private UUID venueId;
+    private String venueId;
 
     @NotNull
     @Column(name = "home_team_id", nullable = false)
-    private UUID homeTeamId;
+    private String homeTeamId;
 
     @NotNull
     @Column(name = "away_team_id", nullable = false)
-    private UUID awayTeamId;
+    private String awayTeamId;
 
     @NotNull
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
@@ -51,7 +51,7 @@ public class Event {
     protected Event() {
     }
 
-    public Event(String title, LocalDateTime eventDate, UUID venueId, UUID homeTeamId, UUID awayTeamId) {
+    public Event(String title, LocalDateTime eventDate, String venueId, String homeTeamId, String awayTeamId) {
         this.title = title;
         this.eventDate = eventDate;
         this.status = EventStatusEnum.SCHEDULED;
@@ -60,7 +60,7 @@ public class Event {
         this.awayTeamId = awayTeamId;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
@@ -76,15 +76,15 @@ public class Event {
         return status;
     }
 
-    public UUID getVenueId() {
+    public String getVenueId() {
         return venueId;
     }
 
-    public UUID getHomeTeamId() {
+    public String getHomeTeamId() {
         return homeTeamId;
     }
 
-    public UUID getAwayTeamId() {
+    public String getAwayTeamId() {
         return awayTeamId;
     }
 

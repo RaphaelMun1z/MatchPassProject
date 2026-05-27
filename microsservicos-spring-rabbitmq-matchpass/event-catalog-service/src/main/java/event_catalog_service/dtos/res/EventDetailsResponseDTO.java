@@ -1,15 +1,20 @@
 package event_catalog_service.dtos.res;
 
+import event_catalog_service.entities.enums.EventStatusEnum;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 public record EventDetailsResponseDTO(
-    UUID eventId,
+    String eventId,
     String title,
     LocalDateTime eventDate,
+    EventStatusEnum status,
     String venueName,
     String venueCity,
-    List<SectorPricingResponseDTO> availableSectors
+    String venueState,
+    String homeTeamName,
+    String awayTeamName,
+    List<EventSectorDetailsDTO> sectorsDetails
 ) {
 }

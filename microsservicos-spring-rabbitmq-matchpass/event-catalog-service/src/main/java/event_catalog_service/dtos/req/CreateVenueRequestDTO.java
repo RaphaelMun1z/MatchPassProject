@@ -1,14 +1,16 @@
 package event_catalog_service.dtos.req;
 
 import event_catalog_service.entities.Sector;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.List;
 
 public record CreateVenueRequestDTO(
-    String name,
-    String city,
-    String state,
-    Integer totalCapacity,
-    List<SectorRequestDTO> sectors
+    @NotNull String name,
+    @NotNull String city,
+    @NotNull String state,
+    @NotNull @PositiveOrZero Integer totalCapacity,
+    @NotNull List<SectorRequestDTO> sectors
 ) {
 }

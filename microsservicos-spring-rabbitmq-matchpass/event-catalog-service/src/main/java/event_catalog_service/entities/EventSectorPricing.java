@@ -12,7 +12,7 @@ import java.util.UUID;
 public class EventSectorPricing {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
@@ -20,7 +20,7 @@ public class EventSectorPricing {
 
     @NotNull
     @Column(name = "sector_id", nullable = false)
-    private UUID sectorId;
+    private String sectorId;
 
     @NotNull
     @PositiveOrZero(message = "O preço base não pode ser negativo")
@@ -39,7 +39,7 @@ public class EventSectorPricing {
     protected EventSectorPricing() {
     }
 
-    public EventSectorPricing(Event event, UUID sectorId, BigDecimal basePrice, BigDecimal halfPrice) {
+    public EventSectorPricing(Event event, String sectorId, BigDecimal basePrice, BigDecimal halfPrice) {
         this.event = event;
         this.sectorId = sectorId;
         this.basePrice = basePrice;
@@ -47,7 +47,7 @@ public class EventSectorPricing {
         this.isAvailable = true;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
@@ -55,7 +55,7 @@ public class EventSectorPricing {
         return event;
     }
 
-    public UUID getSectorId() {
+    public String getSectorId() {
         return sectorId;
     }
 

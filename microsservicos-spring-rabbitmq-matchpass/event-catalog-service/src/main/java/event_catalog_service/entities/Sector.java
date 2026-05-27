@@ -11,7 +11,7 @@ import java.util.UUID;
 public class Sector {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)
@@ -28,32 +28,20 @@ public class Sector {
     private Integer capacity;
 
     @NotNull
-    @PositiveOrZero(message = "O valor base do ingresso deve ser maior ou igual a zero")
-    @Column(nullable = false)
-    private BigDecimal basePrice;
-
-    @NotNull
-    @PositiveOrZero(message = "O valor do meio ingresso deve ser maior ou igual a zero")
-    @Column(nullable = false)
-    private BigDecimal halfPrice;
-
-    @NotNull
     @Column(name = "has_numbered_seats", nullable = false)
     private Boolean hasNumberedSeats;
 
     protected Sector() {
     }
 
-    public Sector(Venue venue, String name, Integer capacity, BigDecimal basePrice, BigDecimal halfPrice, Boolean hasNumberedSeats) {
+    public Sector(Venue venue, String name, Integer capacity, Boolean hasNumberedSeats) {
         this.venue = venue;
         this.name = name;
         this.capacity = capacity;
-        this.basePrice = basePrice;
-        this.halfPrice = halfPrice;
         this.hasNumberedSeats = hasNumberedSeats;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
@@ -67,14 +55,6 @@ public class Sector {
 
     public Integer getCapacity() {
         return capacity;
-    }
-
-    public BigDecimal getBasePrice() {
-        return basePrice;
-    }
-
-    public BigDecimal getHalfPrice() {
-        return halfPrice;
     }
 
     public Boolean getHasNumberedSeats() {

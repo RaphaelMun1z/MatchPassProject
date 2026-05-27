@@ -15,7 +15,7 @@ import java.util.UUID;
 public class Venue {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @NotBlank(message = "O nome do local é obrigatório")
     @Size(min = 3, max = 150, message = "O nome deve ter entre 3 e 150 caracteres")
@@ -49,7 +49,7 @@ public class Venue {
         this.totalCapacity = totalCapacity;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 

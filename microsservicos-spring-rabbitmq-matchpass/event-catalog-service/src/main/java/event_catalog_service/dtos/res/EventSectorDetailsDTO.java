@@ -1,13 +1,12 @@
 package event_catalog_service.dtos.res;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
-public record SectorPricingResponseDTO(
+public record EventSectorDetailsDTO(
     String sectorId,
     String sectorName,
-    BigDecimal basePrice,
-    BigDecimal halfPrice,
+    BigDecimal sectorBasePrice,
+    BigDecimal sectorHalfPrice,
     Boolean hasNumberedSeats
 ) {
 }
