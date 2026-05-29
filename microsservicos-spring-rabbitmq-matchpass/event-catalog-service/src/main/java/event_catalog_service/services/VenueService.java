@@ -2,7 +2,6 @@ package event_catalog_service.services;
 
 import event_catalog_service.dtos.req.CreateVenueRequestDTO;
 import event_catalog_service.dtos.req.SectorRequestDTO;
-import event_catalog_service.dtos.res.SectorPricingResponseDTO;
 import event_catalog_service.dtos.res.SectorResponseDTO;
 import event_catalog_service.dtos.res.VenueResponseDTO;
 import event_catalog_service.entities.Sector;
@@ -13,8 +12,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class VenueService {
@@ -40,18 +37,35 @@ public class VenueService {
                             s.getHasNumberedSeats()
                         )).toList();
 
-                VenueResponseDTO venueDTO =
-                    new VenueResponseDTO(
-                        v.getId(),
-                        v.getName(),
-                        v.getCity(),
-                        v.getState(),
-                        v.getTotalCapacity(),
-                        sectorsDTO
-                    );
-                return venueDTO;
+                return venueObjToVenueResDTO(v, sectorsDTO);
             }).toList();
         return createdVenues;
+    }
+
+    public VenueResponseDTO getVenueById(String id) {
+        Venue venueFound = findVenueById(id);
+
+        List<SectorResponseDTO> sectorsDTO =
+            venueFound.getSectors()
+                .stream()
+                .map(s -> new SectorResponseDTO(
+                    s.getId(),
+                    s.getName(),
+                    s.getHasNumberedSeats()
+                )).toList();
+
+        return venueObjToVenueResDTO(venueFound, sectorsDTO);
+    }
+
+    public List<VenueResponseDTO> getVenuesByLocation(String city, String state) {
+        List<Venue> venues = venueRepository.findByCityIgnoreCaseAndStateIgnoreCase(city, state);
+
+        List<VenueResponseDTO> venuesDTO = venues
+            .stream()
+            .map(v -> venueObjToVenueResDTO(v, null))
+            .toList();
+
+        return venuesDTO;
     }
 
     @Transactional
@@ -88,14 +102,46 @@ public class VenueService {
             }).toList();
 
         // Transforma Venue em ResponseDTO
-        return new VenueResponseDTO(
-            savedVenue.getId(),
-            savedVenue.getName(),
-            savedVenue.getCity(),
-            savedVenue.getState(),
-            savedVenue.getTotalCapacity(),
-            sectorsDTO
+        return venueObjToVenueResDTO(savedVenue, sectorsDTO);
+    }
+
+    @Transactional
+    public SectorResponseDTO addSectorToVenue(SectorRequestDTO sectorDTO, String venueId) {
+        Venue venueFound = findVenueById(venueId);
+
+        Sector newSector = new Sector(
+            venueFound,
+            sectorDTO.name(),
+            sectorDTO.capacity(),
+            sectorDTO.hasNumberedSeats()
         );
+        Sector savedSector = sectorRepository.save(newSector);
+
+        venueFound.addSector(savedSector);
+
+        return new SectorResponseDTO(
+            savedSector.getId(),
+            savedSector.getName(),
+            savedSector.getHasNumberedSeats()
+        );
+    }
+
+    @Transactional
+    public void removeSectorFromVenue(String venueId, String sectorId) {
+        Venue venueFound = findVenueById(venueId);
+        Sector sectorToRemove = venueFound.getSectors()
+            .stream()
+            .filter(s -> s.getId().equals(sectorId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Setor com ID " + sectorId + " não encontrado no venue " + venueId));
+
+        venueFound.removeSector(sectorToRemove);
+    }
+
+    // Métodos privados
+
+    private Venue findVenueById(String id) {
+        return venueRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Setor não encontrado com o ID: " + id));
     }
 
     private void validateTotalCapacity(CreateVenueRequestDTO dto) {
@@ -106,52 +152,14 @@ public class VenueService {
         }
     }
 
-    public VenueResponseDTO getVenueById(String id) {
-        Optional<Venue> venueFound = venueRepository.findById(id);
-        if (venueFound.isEmpty()) {
-            throw new IllegalArgumentException("Não há nenhum registro com esse identificador");
-        }
-
-        List<SectorResponseDTO> sectorsDTO =
-            venueFound.get().getSectors()
-                .stream()
-                .map(s -> new SectorResponseDTO(
-                    s.getId(),
-                    s.getName(),
-                    s.getHasNumberedSeats()
-                )).toList();
-
+    private VenueResponseDTO venueObjToVenueResDTO(Venue venue, List<SectorResponseDTO> sectorsResDTO) {
         return new VenueResponseDTO(
-            venueFound.get().getId(),
-            venueFound.get().getName(),
-            venueFound.get().getCity(),
-            venueFound.get().getState(),
-            venueFound.get().getTotalCapacity(),
-            sectorsDTO
-        );
-    }
-
-    @Transactional
-    public SectorResponseDTO addSectorToVenue(SectorRequestDTO sectorDTO, String venueId) {
-        Optional<Venue> venueFound = venueRepository.findById(venueId);
-        if (venueFound.isEmpty()) {
-            throw new IllegalArgumentException("O local indicado não foi encontrado.");
-        }
-
-        Sector newSector = new Sector(
-            venueFound.get(),
-            sectorDTO.name(),
-            sectorDTO.capacity(),
-            sectorDTO.hasNumberedSeats()
-        );
-        Sector savedSector = sectorRepository.save(newSector);
-
-        venueFound.get().addSector(savedSector);
-
-        return new SectorResponseDTO(
-            savedSector.getId(),
-            savedSector.getName(),
-            savedSector.getHasNumberedSeats()
+            venue.getId(),
+            venue.getName(),
+            venue.getCity(),
+            venue.getState(),
+            venue.getTotalCapacity(),
+            sectorsResDTO
         );
     }
 }
