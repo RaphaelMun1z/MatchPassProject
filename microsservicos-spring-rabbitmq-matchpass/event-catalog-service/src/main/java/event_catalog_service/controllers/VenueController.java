@@ -20,21 +20,21 @@ public class VenueController {
     }
 
     @GetMapping("/v1")
-    public ResponseEntity<List<VenueResponseDTO>> getAllVenues() {
-        return ResponseEntity.ok().body(venueService.getAllVenues());
+    public ResponseEntity<List<VenueResponseDTO>> findAllVenuesWithSectors() {
+        return ResponseEntity.ok().body(venueService.findAllVenuesWithSectors());
     }
 
     @GetMapping("/v1/{id}")
-    public ResponseEntity<VenueResponseDTO> getVenueById(
+    public ResponseEntity<VenueResponseDTO> findVenueById(
         @PathVariable String id) {
-        return ResponseEntity.ok(venueService.getVenueById(id));
+        return ResponseEntity.ok(venueService.findVenueById(id));
     }
 
     @GetMapping("/v1/filter-by-location")
-    public ResponseEntity<List<VenueResponseDTO>> getVenuesByLocation(
+    public ResponseEntity<List<VenueResponseDTO>> findVenuesByLocation(
         @RequestParam String city,
         @RequestParam String state) {
-        return ResponseEntity.ok(venueService.getVenuesByLocation(city, state));
+        return ResponseEntity.ok(venueService.findVenuesByLocation(city, state));
     }
 
     @PostMapping("/v1")

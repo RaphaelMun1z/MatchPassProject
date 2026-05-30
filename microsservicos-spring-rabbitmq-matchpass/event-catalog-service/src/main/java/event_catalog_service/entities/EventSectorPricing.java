@@ -5,10 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
-@Table(name = "tb_event_sector_pricings")
+@Table(name = "tb_event_sector_pricings", uniqueConstraints = {
+    @UniqueConstraint(
+        columnNames = {"event_id", "sector_id"}
+    )
+})
 public class EventSectorPricing {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -80,7 +80,7 @@ public class Venue {
     }
 
     public void addMultipleSectors(List<Sector> sectors) {
-        this.sectors.addAll(sectors);
+        sectors.forEach(this::addSector);
     }
 
     public void removeSector(Sector sector) {

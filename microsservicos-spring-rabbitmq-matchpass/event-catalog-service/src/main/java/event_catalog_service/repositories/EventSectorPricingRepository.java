@@ -18,4 +18,9 @@ public interface EventSectorPricingRepository extends JpaRepository<EventSectorP
             WHERE esp.event.id = :eventId
         """)
     List<EventSectorDetailsDTO> findEventSectorsDetailsByEventId(@Param("eventId") String eventId);
+
+    boolean existsByEvent_IdAndSectorId(
+        String eventId,
+        String sectorId
+    );
 }

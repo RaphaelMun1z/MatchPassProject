@@ -8,10 +8,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
-@Table(name = "tb_events")
+@Table(name = "tb_events", uniqueConstraints = {
+    @UniqueConstraint(
+        columnNames = {"title", "event_date", "venue_id"}
+    )
+})
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,7 +51,7 @@ public class Event {
     private String awayTeamId;
 
     @NotNull
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventSectorPricing> pricings = new ArrayList<>();
 
     protected Event() {

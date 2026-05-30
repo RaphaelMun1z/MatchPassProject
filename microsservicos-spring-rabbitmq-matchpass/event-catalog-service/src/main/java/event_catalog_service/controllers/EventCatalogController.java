@@ -24,7 +24,7 @@ public class EventCatalogController {
 
     @PostMapping("/v1")
     public ResponseEntity<EventDetailsResponseDTO> createEvent(@RequestBody CreateEventRequestDTO dto) {
-        return ResponseEntity.ok().body(eventCatalogService.createEvent(dto));
+        return ResponseEntity.ok().body(eventCatalogService.registerEvent(dto));
     }
 
     @PostMapping("/v1/{id}/add-sector")

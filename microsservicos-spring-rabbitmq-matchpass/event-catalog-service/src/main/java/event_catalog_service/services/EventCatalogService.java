@@ -10,90 +10,108 @@ import event_catalog_service.entities.Event;
 import event_catalog_service.entities.EventSectorPricing;
 import event_catalog_service.entities.Team;
 import event_catalog_service.entities.Venue;
-import event_catalog_service.repositories.*;
-import event_catalog_service.services.dataHandler.EventCatalogDataHandler;
+import event_catalog_service.repositories.EventRepository;
+import event_catalog_service.repositories.EventSectorPricingRepository;
+import event_catalog_service.services.dataHandler.event.EventMapper;
+import event_catalog_service.services.dataHandler.event.EventQueryService;
+import event_catalog_service.services.dataHandler.event.EventValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class EventCatalogService extends EventCatalogDataHandler {
-    public EventCatalogService(EventRepository eventRepository, VenueRepository venueRepository, SectorRepository sectorRepository, EventSectorPricingRepository eventSectorPricingRepository, TeamRepository teamRepository) {
-        super(eventRepository, venueRepository, sectorRepository, eventSectorPricingRepository, teamRepository);
+public class EventCatalogService {
+    private final EventRepository eventRepository;
+    private final EventSectorPricingRepository eventSectorPricingRepository;
+
+    private final EventQueryService eventQuery;
+    private final EventMapper mapper;
+    private final EventValidator validator;
+
+    public EventCatalogService(
+        EventRepository eventRepository,
+        EventSectorPricingRepository eventSectorPricingRepository,
+        EventQueryService eventQuery,
+        EventMapper mapper,
+        EventValidator validator) {
+        this.eventRepository = eventRepository;
+        this.eventSectorPricingRepository = eventSectorPricingRepository;
+        this.eventQuery = eventQuery;
+        this.mapper = mapper;
+        this.validator = validator;
     }
 
     public EventDetailsResponseDTO findEventById(String eventId) {
-        EventDetailsProjection event = eventRepository.findEventDetailsByEventId(eventId)
-            .orElseThrow(() -> new IllegalArgumentException("Evento não encontrado"));
-
+        EventDetailsProjection event = eventQuery.getEventDetailsById(eventId);
         List<EventSectorDetailsDTO> eventSectorsDetailsDTO = eventSectorPricingRepository.findEventSectorsDetailsByEventId(eventId);
-
-        return new EventDetailsResponseDTO(
-            event.getEventId(),
-            event.getTitle(),
-            event.getEventDate(),
-            event.getStatus(),
-
-            event.getVenueName(),
-            event.getVenueCity(),
-            event.getVenueState(),
-
-            event.getHomeTeamName(),
-            event.getAwayTeamName(),
-
+        return mapper.toEventDetailsResponseDTO(
+            event,
             eventSectorsDetailsDTO
         );
     }
 
     @Transactional
-    public EventDetailsResponseDTO createEvent(CreateEventRequestDTO dto) {
-        // Busca Local do evento, Time Mandante e Visitante
-        Venue eventVenue = venueRepository.findById(dto.venueId()).orElseThrow(() -> new IllegalArgumentException("Local de evento não encontrado com o ID: " + dto.venueId()));
-        Team homeTeam = teamRepository.findById(dto.homeTeamId()).orElseThrow(() -> new IllegalArgumentException("Time mandante não encontrado com o ID: " + dto.homeTeamId()));
-        Team awayTeam = teamRepository.findById(dto.awayTeamId()).orElseThrow(() -> new IllegalArgumentException("Time visitante não encontrado com o ID: " + dto.awayTeamId()));
+    public EventDetailsResponseDTO registerEvent(CreateEventRequestDTO dto) {
+        Venue venue = eventQuery.getVenueById(dto.venueId());
+        Team homeTeam = eventQuery.getTeamById(dto.homeTeamId());
+        Team awayTeam = eventQuery.getTeamById(dto.awayTeamId());
 
-        if (homeTeam.equals(awayTeam)) {
-            throw new IllegalArgumentException("O time mandante não pode ser o mesmo time visitante.");
-        }
+        validator.validateIsSameTeam(homeTeam, awayTeam);
 
-        // Cria e Salva Evento
-        Event newEvent = createEventInstance(dto, eventVenue, homeTeam, awayTeam);
+        Event newEvent = new Event(
+            dto.title(),
+            dto.eventDate(),
+            venue.getId(),
+            homeTeam.getId(),
+            awayTeam.getId()
+        );
+        Event savedEvent = eventRepository.save(newEvent);
 
-        // Salva Preço dos setores desse evento
         List<EventSectorPricing> eventSectorPricingList =
             dto.sectorsPricing()
                 .stream()
-                .map(sp -> new EventSectorPricing(
-                    newEvent,
-                    sp.sectorId(),
-                    sp.basePrice(),
-                    sp.halfPrice()
+                .map(sectorPricing -> new EventSectorPricing(
+                    savedEvent,
+                    sectorPricing.sectorId(),
+                    sectorPricing.basePrice(),
+                    sectorPricing.halfPrice()
                 )).toList();
         eventSectorPricingRepository.saveAll(eventSectorPricingList);
 
-        // Busca detalhes dos setores desse evento
-        List<EventSectorDetailsDTO> eventSectorsDetails = eventSectorPricingRepository.findEventSectorsDetailsByEventId(saveEvent.getId());
+        List<EventSectorDetailsDTO> eventSectorsDetails = eventSectorPricingRepository.findEventSectorsDetailsByEventId(savedEvent.getId());
 
-        // Prepara DTO para retorno
-        return createEventDetailsResponseDTO(saveEvent, eventVenue, homeTeam, awayTeam, eventSectorsDetails);
+        return mapper.toEventDetailsResponseDTO(savedEvent, venue, homeTeam, awayTeam, eventSectorsDetails);
     }
 
     @Transactional
     public SectorPricingResponseDTO addSectorToAnEvent(String eventId, SectorPricingRequestDTO dto) {
-        Event eventFound = getEventById(eventId);
-        EventSectorPricing savedESP = createEventSectorPricingInstance(eventFound, dto);
+        Event eventFound = eventQuery.getEventById(eventId);
+
+        validator.validateDuplicatedSector(eventId, dto.sectorId());
+
+        EventSectorPricing newESP = new EventSectorPricing(
+            eventFound,
+            dto.sectorId(),
+            dto.basePrice(),
+            dto.halfPrice()
+        );
+        EventSectorPricing savedESP = eventSectorPricingRepository.save(newESP);
+
         eventFound.addPricing(savedESP);
-        return createSectorPricingResponse(getSectorById(dto.sectorId()), savedESP);
+        return mapper.toSectorPricingResponseDTO(eventQuery.getSectorById(dto.sectorId()), savedESP);
     }
 
     @Transactional
     public void removeSectorFromAnEvent(String eventId, String secId) {
-        Event eventFound = getEventById(eventId);
-        EventSectorPricing espFound = eventFound.getPricings()
-            .stream()
-            .filter(eventSectorPricing -> eventSectorPricing.getSectorId().equals(secId)).toList().getFirst();
-        eventFound.removePricing(espFound);
+        Event eventFound = eventQuery.getEventById(eventId);
+        EventSectorPricing eventSectorPricingFound =
+            eventFound.getPricings()
+                .stream()
+                .filter(eventSectorPricing -> eventSectorPricing.getSectorId().equals(secId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado no evento"));
+        eventFound.removePricing(eventSectorPricingFound);
     }
 
 }
