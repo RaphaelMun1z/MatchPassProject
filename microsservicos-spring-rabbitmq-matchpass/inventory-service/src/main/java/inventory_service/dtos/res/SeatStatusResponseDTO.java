@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record SeatStatusResponseDTO(
     String lockId,
     SeatStatusEnum status,
-    LocalDateTime expiresAt
+    LocalDateTime expiresAt,
+    String environment
 ) {
 }

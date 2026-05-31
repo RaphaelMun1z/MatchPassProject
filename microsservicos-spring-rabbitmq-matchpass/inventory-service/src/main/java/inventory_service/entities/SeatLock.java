@@ -18,8 +18,7 @@ public class SeatLock {
     private String sectorId;
 
     private String userId;
-    private Integer quantity;
-    private String seatNumber;
+    private String seatTag;
     private SeatStatusEnum status;
 
     @TimeToLive
@@ -28,13 +27,12 @@ public class SeatLock {
     public SeatLock() {
     }
 
-    public SeatLock(String lockId, String eventId, String sectorId, String userId, Integer quantity, String seatNumber, SeatStatusEnum status, Long ttl) {
+    public SeatLock(String lockId, String eventId, String sectorId, String userId, String seatTag, SeatStatusEnum status, Long ttl) {
         this.lockId = lockId;
         this.eventId = eventId;
         this.sectorId = sectorId;
         this.userId = userId;
-        this.quantity = quantity;
-        this.seatNumber = seatNumber;
+        this.seatTag = seatTag;
         this.status = status;
         this.ttl = ttl;
     }
@@ -55,12 +53,8 @@ public class SeatLock {
         return userId;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public String getSeatNumber() {
-        return seatNumber;
+    public String getSeatTag() {
+        return seatTag;
     }
 
     public SeatStatusEnum getStatus() {

@@ -10,7 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_venues")
+@Table(name = "tb_venues", uniqueConstraints = {
+    @UniqueConstraint(
+        columnNames = {"name", "city", "state"}
+    )
+})
 public class Venue {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

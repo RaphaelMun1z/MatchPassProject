@@ -11,7 +11,7 @@ import java.util.List;
 public interface EventSectorPricingRepository extends JpaRepository<EventSectorPricing, String> {
     @Query("""
             SELECT new event_catalog_service.dtos.res.EventSectorDetailsDTO(
-                esp.sectorId, s.name, esp.basePrice, esp.halfPrice, s.hasNumberedSeats
+                esp.event.id, esp.sectorId, s.name, esp.basePrice, esp.halfPrice, s.hasNumberedSeats
             )
             FROM EventSectorPricing esp
             JOIN Sector s ON esp.sectorId = s.id

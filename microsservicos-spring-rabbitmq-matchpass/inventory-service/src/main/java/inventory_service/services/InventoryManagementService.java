@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,11 +25,15 @@ public class InventoryManagementService {
     }
 
     @Transactional
-    public SeatStatusResponseDTO tryLockSeat(SeatReservationRequestDTO dto, String userId) {
-        Optional<SeatLock> existingLock = seatLockRepository.findByEventIdAndSectorIdAndSeatNumber(dto.eventId(), dto.sectorId(), dto.seatNumber());
+    public SeatStatusResponseDTO tryLockSeat(SeatReservationRequestDTO dto, String userId, String port) {
+        var existingLock = seatLockRepository.findByEventIdAndSectorIdAndSeatTag(
+            dto.eventId(),
+            dto.sectorId(),
+            dto.seatTag()
+        );
 
         if (existingLock.isPresent()) {
-            throw new IllegalStateException("Assento já reservado");
+            throw new IllegalStateException("Assento já se encontra em estado: " + existingLock.get().getStatus());
         }
 
         SeatLock seatLock = new SeatLock(
@@ -38,17 +41,18 @@ public class InventoryManagementService {
             dto.eventId(),
             dto.sectorId(),
             userId,
-            dto.quantity(),
-            dto.seatNumber(),
+            dto.seatTag(),
             SeatStatusEnum.LOCKED,
             LOCK_TTL_SECONDS
         );
+
         SeatLock savedSeatLock = seatLockRepository.save(seatLock);
 
         return new SeatStatusResponseDTO(
             savedSeatLock.getLockId(),
             SeatStatusEnum.LOCKED,
-            LocalDateTime.now().plusSeconds(LOCK_TTL_SECONDS)
+            LocalDateTime.now().plusSeconds(LOCK_TTL_SECONDS),
+            port
         );
     }
 
@@ -64,5 +68,17 @@ public class InventoryManagementService {
     public void releaseSeat(String lockId) {
         SeatLock seatLock = seatLockRepository.findById(lockId).orElseThrow(() -> new RuntimeException("Lock não encontrado"));
         seatLockRepository.delete(seatLock);
+    }
+
+    public SeatStatusResponseDTO checkSeatStatus(String lockId, String port) {
+        SeatLock seatLock = seatLockRepository.findById(lockId)
+            .orElseThrow(() -> new RuntimeException("Lock não encontrado ou expirado"));
+
+        return new SeatStatusResponseDTO(
+            seatLock.getLockId(),
+            seatLock.getStatus(),
+            LocalDateTime.now().minusSeconds(seatLock.getTtl()),
+            port
+        );
     }
 }

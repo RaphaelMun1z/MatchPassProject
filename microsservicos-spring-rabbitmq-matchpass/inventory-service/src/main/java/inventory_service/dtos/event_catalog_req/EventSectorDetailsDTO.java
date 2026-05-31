@@ -1,4 +1,4 @@
-package event_catalog_service.dtos.res;
+package inventory_service.dtos.event_catalog_req;
 
 import java.math.BigDecimal;
 

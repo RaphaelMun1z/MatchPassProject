@@ -9,3 +9,6 @@ spring:
   cloud:
     config:
       profile: dev
+  jpa:
+    hibernate:
+      ddl-auto: create
