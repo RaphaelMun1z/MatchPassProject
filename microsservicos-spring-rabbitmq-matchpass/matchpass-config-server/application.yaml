@@ -3,6 +3,3 @@ server:
 spring:
   application:
     name: matchpass-config-server
-  profiles:
-    active:
-      - native
