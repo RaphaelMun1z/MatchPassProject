@@ -12,7 +12,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_event_catalog_service_data:/var/lib/postgresql
 
   inventory-service-redis-db:
     image: redis:7-alpine
@@ -21,8 +21,22 @@ services:
     ports:
       - '6379:6379'
     volumes:
-      - redis_data:/data
+      - redis_inventory_service_data:/data
+
+  order-service-postgres-db:
+    image: postgres:18.4
+    restart: unless-stopped
+    container_name: postgresql-18.4-order-service
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_order
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_order_service_data:/var/lib/postgresql
 
 volumes:
-  postgres_data:
-  redis_data:
+  postgres_event_catalog_service_data:
+  postgres_order_service_data:
+  redis_inventory_service_data:
