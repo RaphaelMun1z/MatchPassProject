@@ -2,10 +2,13 @@ package order_service.services;
 
 import order_service.dtos.req.CheckoutRequestDTO;
 import order_service.dtos.req.OrderItemRequestDTO;
+import order_service.dtos.res.OrderItemResponseDTO;
+import order_service.dtos.res.OrderResponseDTO;
 import order_service.dtos.res.OrderSummaryResponseDTO;
 import order_service.entities.Order;
 import order_service.entities.OrderItem;
 import order_service.entities.enums.OrderStatus;
+import order_service.exceptions.models.NotFoundException;
 import order_service.repositories.OrderItemRepository;
 import order_service.repositories.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -54,6 +57,49 @@ public class OrderService {
             savedOrder.getId(),
             savedOrder.getTotalAmount(),
             savedOrder.getStatus(),
+            "payment-url"
+        );
+    }
+
+    public OrderResponseDTO findProcessById(String processId) {
+        Order order = orderRepository.findById(processId).orElseThrow(
+            () -> new NotFoundException("Nenhum pedido encontrado.")
+        );
+        List<OrderItemResponseDTO> orderItems = order.getItems()
+            .stream().map(oi -> new OrderItemResponseDTO(
+                oi.getId(),
+                oi.getSectorId(),
+                oi.getSeatTag(),
+                oi.getTicketType(),
+                oi.getAppliedPrice()
+            )).toList();
+        return new OrderResponseDTO(
+            order.getId(),
+            order.getTotalAmount(),
+            order.getStatus(),
+            "payment-url",
+            orderItems
+        );
+    }
+
+    public List<OrderSummaryResponseDTO> findProcessByEventId(String eventId) {
+        List<Order> orders = orderRepository.findByEventId(eventId);
+        return orders.stream().map(order -> new OrderSummaryResponseDTO(
+            order.getId(),
+            order.getTotalAmount(),
+            order.getStatus(),
+            "payment-url"
+        )).toList();
+    }
+
+    public OrderSummaryResponseDTO findProcessBySeatTag(String seatTag) {
+        Order order = orderRepository.findByItemsSeatTag(seatTag).orElseThrow(
+            () -> new NotFoundException("Nenhum pedido encontrado.")
+        );
+        return new OrderSummaryResponseDTO(
+            order.getId(),
+            order.getTotalAmount(),
+            order.getStatus(),
             "payment-url"
         );
     }
