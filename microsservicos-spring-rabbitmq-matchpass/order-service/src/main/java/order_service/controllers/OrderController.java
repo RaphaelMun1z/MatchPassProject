@@ -3,6 +3,7 @@ package order_service.controllers;
 import order_service.dtos.req.CheckoutRequestDTO;
 import order_service.dtos.res.OrderResponseDTO;
 import order_service.dtos.res.OrderSummaryResponseDTO;
+import order_service.entities.enums.OrderStatusEnum;
 import order_service.services.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,5 +46,13 @@ public class OrderController {
         @PathVariable String seatTag
     ) {
         return ResponseEntity.ok(orderService.findProcessBySeatTag(seatTag));
+    }
+
+    @PatchMapping("/checkout/{orderId}")
+    public ResponseEntity<OrderSummaryResponseDTO> updateProcessStatus(
+        @PathVariable String orderId,
+        @RequestParam OrderStatusEnum status
+    ) {
+        return ResponseEntity.ok(orderService.updateProcessStatus(orderId, status));
     }
 }

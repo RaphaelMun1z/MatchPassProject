@@ -1,7 +1,7 @@
 package order_service.entities;
 
 import jakarta.persistence.*;
-import order_service.entities.enums.OrderStatus;
+import order_service.entities.enums.OrderStatusEnum;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class Order {
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private OrderStatusEnum status;
 
     private LocalDateTime createdAt;
 
@@ -30,7 +30,7 @@ public class Order {
     public Order() {
     }
 
-    public Order(String eventId, String userId, BigDecimal totalAmount, OrderStatus status) {
+    public Order(String eventId, String userId, BigDecimal totalAmount, OrderStatusEnum status) {
         this.eventId = eventId;
         this.userId = userId;
         this.totalAmount = totalAmount;
@@ -54,7 +54,7 @@ public class Order {
         return totalAmount;
     }
 
-    public OrderStatus getStatus() {
+    public OrderStatusEnum getStatus() {
         return status;
     }
 
@@ -74,6 +74,10 @@ public class Order {
 
     public void addItems(List<OrderItem> items) {
         items.forEach(this::addItem);
+    }
+
+    public void updateStatus(OrderStatusEnum status) {
+        this.status = status;
     }
 
     @Override

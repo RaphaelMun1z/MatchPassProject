@@ -1,6 +1,6 @@
 package order_service.dtos.res;
 
-import order_service.entities.enums.OrderStatus;
+import order_service.entities.enums.OrderStatusEnum;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 public record OrderResponseDTO(
     String orderId,
     BigDecimal totalAmount,
-    OrderStatus status,
+    OrderStatusEnum status,
     String paymentUrl,
     List<OrderItemResponseDTO> itens
 ) {

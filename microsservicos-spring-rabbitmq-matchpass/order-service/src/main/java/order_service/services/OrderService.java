@@ -7,7 +7,7 @@ import order_service.dtos.res.OrderResponseDTO;
 import order_service.dtos.res.OrderSummaryResponseDTO;
 import order_service.entities.Order;
 import order_service.entities.OrderItem;
-import order_service.entities.enums.OrderStatus;
+import order_service.entities.enums.OrderStatusEnum;
 import order_service.exceptions.models.NotFoundException;
 import order_service.repositories.OrderItemRepository;
 import order_service.repositories.OrderRepository;
@@ -38,7 +38,7 @@ public class OrderService {
             request.eventId(),
             request.userId(),
             totalAmount,
-            OrderStatus.PENDING
+            OrderStatusEnum.PENDING
         );
 
         List<OrderItem> newOrderItems = request.items()
@@ -96,6 +96,20 @@ public class OrderService {
         Order order = orderRepository.findByItemsSeatTag(seatTag).orElseThrow(
             () -> new NotFoundException("Nenhum pedido encontrado.")
         );
+        return new OrderSummaryResponseDTO(
+            order.getId(),
+            order.getTotalAmount(),
+            order.getStatus(),
+            "payment-url"
+        );
+    }
+
+    @Transactional
+    public OrderSummaryResponseDTO updateProcessStatus(String orderId, OrderStatusEnum orderStatusEnum) {
+        Order order = orderRepository.findById(orderId).orElseThrow(
+            () -> new NotFoundException("Nenhum pedido encontrado.")
+        );
+        order.updateStatus(orderStatusEnum);
         return new OrderSummaryResponseDTO(
             order.getId(),
             order.getTotalAmount(),

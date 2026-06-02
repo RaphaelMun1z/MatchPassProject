@@ -1,13 +1,13 @@
 package order_service.dtos.res;
 
-import order_service.entities.enums.OrderStatus;
+import order_service.entities.enums.OrderStatusEnum;
 
 import java.math.BigDecimal;
 
 public record OrderSummaryResponseDTO(
     String orderId,
     BigDecimal totalAmount,
-    OrderStatus status,
+    OrderStatusEnum status,
     String paymentUrl
 ) {
 }
