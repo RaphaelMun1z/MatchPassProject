@@ -12,7 +12,6 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private String eventId;
     private String sectorId;
     private String seatTag;
 
@@ -20,6 +19,48 @@ public class OrderItem {
     private TicketType ticketType;
 
     private BigDecimal appliedPrice;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+
+    public OrderItem() {
+    }
+
+    public OrderItem(String sectorId, String seatTag, TicketType ticketType, BigDecimal appliedPrice) {
+        this.sectorId = sectorId;
+        this.seatTag = seatTag;
+        this.ticketType = ticketType;
+        this.appliedPrice = appliedPrice;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getSectorId() {
+        return sectorId;
+    }
+
+    public String getSeatTag() {
+        return seatTag;
+    }
+
+    public TicketType getTicketType() {
+        return ticketType;
+    }
+
+    public BigDecimal getAppliedPrice() {
+        return appliedPrice;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 
     @Override
     public boolean equals(Object o) {

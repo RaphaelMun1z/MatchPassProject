@@ -5,6 +5,7 @@ import order_service.entities.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,6 +15,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    private String eventId;
     private String userId;
     private BigDecimal totalAmount;
 
@@ -22,22 +24,26 @@ public class Order {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 
     public Order() {
     }
 
-    public Order(String userId, BigDecimal totalAmount, OrderStatus status, List<OrderItem> items) {
+    public Order(String eventId, String userId, BigDecimal totalAmount, OrderStatus status) {
+        this.eventId = eventId;
         this.userId = userId;
         this.totalAmount = totalAmount;
         this.status = status;
-        this.items = items;
         this.createdAt = LocalDateTime.now();
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getEventId() {
+        return eventId;
     }
 
     public String getUserId() {
@@ -58,6 +64,16 @@ public class Order {
 
     public List<OrderItem> getItems() {
         return items;
+    }
+
+    // Métodos Auxiliares
+    public void addItem(OrderItem item) {
+        item.setOrder(this);
+        this.items.add(item);
+    }
+
+    public void addItems(List<OrderItem> items) {
+        items.forEach(this::addItem);
     }
 
     @Override
