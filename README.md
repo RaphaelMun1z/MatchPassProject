@@ -51,7 +51,7 @@ Todos os serviços, orquestradores e bancos de dados estão mapeados individualm
 | 🟡 | Order Service | `8200` | PostgreSQL `5433` - db_order |
 | 🟡 | Ticket Service | `8300` | PostgreSQL `5434` - db_ticket |
 | 🔴 | Payment Service | `8400` | PostgreSQL `5432` - db_payment |
-| 🔴 | Notification Service| `8500` | MongoDB `27017` - db_logs |
+| 🟡 | Notification Service| `8500` | MongoDB `27017` - db_logs |
 | 🔴 | Identity Service | `8600` | PostgreSQL `5432` - db_identity |
 
 ---
