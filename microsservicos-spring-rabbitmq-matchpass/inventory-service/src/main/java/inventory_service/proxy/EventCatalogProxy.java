@@ -4,22 +4,19 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(
-    name = "event-catalog-service",
-    url = "${event-catalog.service.url}"
-)
+@FeignClient(name = "event-catalog-service")
 public interface EventCatalogProxy {
     @GetMapping("/api/event/validate/v1/{eventId}/exists")
-    void validateEvent(@PathVariable String eventId);
+    String validateEvent(@PathVariable String eventId);
 
     @GetMapping("/api/event/validate/v1/{eventId}/sector/{sectorId}/exists")
-    void validateEventSector(
+    String validateEventSector(
         @PathVariable String eventId,
         @PathVariable String sectorId
     );
 
     @GetMapping("/api/event/validate/v1/{eventId}/sector/{sectorId}/seats/{seatsAmount}")
-    void validateEventSectorSeatCreating(
+    String validateEventSectorSeatCreating(
         @PathVariable String eventId,
         @PathVariable String sectorId,
         @PathVariable int seatsAmount

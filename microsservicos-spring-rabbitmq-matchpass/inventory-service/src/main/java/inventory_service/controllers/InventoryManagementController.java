@@ -4,7 +4,6 @@ import inventory_service.dtos.req.SeatReservationRequestDTO;
 import inventory_service.dtos.res.SeatResponseDTO;
 import inventory_service.dtos.res.SeatStatusResponseDTO;
 import inventory_service.entities.enums.SeatStatusEnum;
-import inventory_service.environment.InstanceInformationService;
 import inventory_service.services.InventoryManagementService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/inventory")
+@RequestMapping("/inventory-service/api/inventory")
 public class InventoryManagementController {
-    private final InstanceInformationService informationService;
     private final InventoryManagementService inventoryManagementService;
 
-    public InventoryManagementController(InstanceInformationService informationService, InventoryManagementService inventoryManagementService) {
-        this.informationService = informationService;
+    public InventoryManagementController(InventoryManagementService inventoryManagementService) {
         this.inventoryManagementService = inventoryManagementService;
     }
 
@@ -57,8 +54,7 @@ public class InventoryManagementController {
         );
         return ResponseEntity.ok(inventoryManagementService.tryLockSeat(
             dto,
-            userId,
-            "PORT " + informationService.retrieveServerPort()
+            userId
         ));
     }
 
@@ -68,8 +64,7 @@ public class InventoryManagementController {
     )
     public ResponseEntity<SeatStatusResponseDTO> checkSeatStatus(@PathVariable String seatTag) {
         return ResponseEntity.ok(inventoryManagementService.checkSeatStatus(
-            seatTag,
-            "PORT " + informationService.retrieveServerPort()
+            seatTag
         ));
     }
 
@@ -88,8 +83,7 @@ public class InventoryManagementController {
     @GetMapping("user/{userId}")
     public ResponseEntity<List<SeatStatusResponseDTO>> findUserSeats(@PathVariable String userId) {
         return ResponseEntity.ok(inventoryManagementService.findUserSeats(
-            userId,
-            "PORT " + informationService.retrieveServerPort()
+            userId
         ));
     }
 
@@ -100,17 +94,15 @@ public class InventoryManagementController {
     ) {
         return ResponseEntity.ok(inventoryManagementService.findEventSeatsByStatus(
             eventId,
-            status,
-            "PORT " + informationService.retrieveServerPort())
-        );
+            status
+        ));
     }
 
     @GetMapping("seat/{seatId}")
     public ResponseEntity<SeatResponseDTO> findSeatById(@PathVariable String seatId) {
         return ResponseEntity.ok(inventoryManagementService.findSeatById(
-            seatId,
-            "PORT " + informationService.retrieveServerPort())
-        );
+            seatId
+        ));
     }
 
     @GetMapping("event/{eventId}/sector/{sectorId}/seats")
@@ -121,8 +113,7 @@ public class InventoryManagementController {
         return ResponseEntity.ok(inventoryManagementService.findEventSectorSeatsByStatus(
             eventId,
             sectorId,
-            status,
-            "PORT " + informationService.retrieveServerPort()
+            status
         ));
     }
 }

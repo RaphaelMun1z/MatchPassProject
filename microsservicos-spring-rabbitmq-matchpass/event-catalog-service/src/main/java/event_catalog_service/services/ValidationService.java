@@ -3,6 +3,7 @@ package event_catalog_service.services;
 import event_catalog_service.dtos.res.EventSectorDetailsDTO;
 import event_catalog_service.entities.Event;
 import event_catalog_service.entities.enums.EventStatusEnum;
+import event_catalog_service.environment.InstanceInformationService;
 import event_catalog_service.exceptions.models.BusinessException;
 import event_catalog_service.exceptions.models.NotFoundException;
 import event_catalog_service.repositories.EventRepository;
@@ -14,15 +15,18 @@ import java.util.Optional;
 
 @Service
 public class ValidationService {
+    private final InstanceInformationService informationService;
+
     private final EventRepository eventRepository;
     private final EventSectorPricingRepository eventSectorPricingRepository;
 
-    public ValidationService(EventRepository eventRepository, EventSectorPricingRepository eventSectorPricingRepository) {
+    public ValidationService(InstanceInformationService informationService, EventRepository eventRepository, EventSectorPricingRepository eventSectorPricingRepository) {
+        this.informationService = informationService;
         this.eventRepository = eventRepository;
         this.eventSectorPricingRepository = eventSectorPricingRepository;
     }
 
-    public void validateEvent(String eventId) {
+    public String validateEvent(String eventId) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new NotFoundException("Evento não encontrado"));
 
@@ -37,9 +41,11 @@ public class ValidationService {
         if (LocalDateTime.now().isAfter(event.getEventDate())) {
             throw new BusinessException("Evento já ocorreu. Vendas não permitidas.");
         }
+
+        return "PORT [EVENT_CATALOG_SERVICE]: " + informationService.retrieveServerPort();
     }
 
-    public void validateEventSector(
+    public String validateEventSector(
         String eventId,
         String sectorId) {
         boolean sectorExists = eventSectorPricingRepository.existsByEvent_IdAndSectorId(eventId, sectorId);
@@ -47,26 +53,26 @@ public class ValidationService {
         if (!sectorExists) {
             throw new NotFoundException("Setor não encontrado no evento.");
         }
+
+        return "PORT [EVENT_CATALOG_SERVICE]: " + informationService.retrieveServerPort();
     }
 
-    public void validateEventSectorSeatCreating(
+    public String validateEventSectorSeatCreating(
         String eventId,
         String sectorId,
         int seatsAmount
     ) {
         Optional<EventSectorDetailsDTO> eventSectorDetails = eventSectorPricingRepository.findEventSectorDetailsByEventIdAndSectorId(eventId, sectorId);
-        System.out.println("11111111111111111111111111");
+
         if (eventSectorDetails.isEmpty()) {
-            System.out.println("AAAAAAAAAAAAAAAAAAAAA");
             throw new NotFoundException("Setor não encontrado no evento.");
         }
 
         int totalCapacity = eventSectorDetails.get().totalCapacity();
         if (totalCapacity < seatsAmount) {
-            System.out.println("BBBBBBBBBBBBBBBBBB");
             throw new IllegalArgumentException("O setor informado possui capacidade máxima de " + totalCapacity + " assentos, enquanto voce solicitou a criação de " + seatsAmount + " assentos");
         }
 
-        System.out.println("CCCCCCCCCCCCCCCCCCCCC");
+        return "PORT [EVENT_CATALOG_SERVICE]: " + informationService.retrieveServerPort();
     }
 }

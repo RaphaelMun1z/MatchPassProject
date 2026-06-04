@@ -10,7 +10,7 @@ import ticket_service.entities.AccessLog;
 import ticket_service.services.AccessService;
 
 @RestController
-@RequestMapping("/api/ticket/access")
+@RequestMapping("/ticket-service/api/ticket/access")
 public class AccessController {
     private final AccessService accessService;
 

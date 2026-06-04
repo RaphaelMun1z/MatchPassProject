@@ -1,13 +1,14 @@
 package event_catalog_service.controllers;
 
 import event_catalog_service.services.ValidationService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/event/validate")
+@RequestMapping("/event-catalog-service/api/event/validate")
 public class ValidationController {
     private final ValidationService validationService;
 
@@ -16,27 +17,27 @@ public class ValidationController {
     }
 
     @GetMapping("/v1/{eventId}/exists")
-    public void validateEvent(@PathVariable String eventId) {
-        validationService.validateEvent(eventId);
+    public ResponseEntity<String> validateEvent(@PathVariable String eventId) {
+        return ResponseEntity.ok(validationService.validateEvent(eventId));
     }
 
     @GetMapping("/v1/{eventId}/sector/{sectorId}/exists")
-    public void validateEventSector(
+    public ResponseEntity<String> validateEventSector(
         @PathVariable String eventId,
         @PathVariable String sectorId) {
-        validationService.validateEventSector(eventId, sectorId);
+        return ResponseEntity.ok(validationService.validateEventSector(eventId, sectorId));
     }
 
     @GetMapping("/v1/{eventId}/sector/{sectorId}/seats/{seatsAmount}")
-    void validateEventSectorSeatCreating(
+    public ResponseEntity<String> validateEventSectorSeatCreating(
         @PathVariable String eventId,
         @PathVariable String sectorId,
         @PathVariable int seatsAmount
     ) {
-        validationService.validateEventSectorSeatCreating(
+        return ResponseEntity.ok(validationService.validateEventSectorSeatCreating(
             eventId,
             sectorId,
             seatsAmount
-        );
+        ));
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/team")
+@RequestMapping("/event-catalog-service/api/team")
 public class TeamController {
     private final TeamService teamService;
 

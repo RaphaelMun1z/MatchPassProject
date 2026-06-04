@@ -8,10 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="event-catalog-service" />
         <module name="inventory-service" />
+        <module name="spring-cloud-config-server" />
+        <module name="api-gateway" />
         <module name="order-service" />
         <module name="notification-service" />
-        <module name="spring-cloud-config-server" />
         <module name="ticket-service" />
+        <module name="naming-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -20,8 +22,10 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="event-catalog-service" options="-parameters" />
       <module name="inventory-service" options="-parameters" />
+      <module name="naming-server" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="spring-cloud-config-server" options="-parameters" />

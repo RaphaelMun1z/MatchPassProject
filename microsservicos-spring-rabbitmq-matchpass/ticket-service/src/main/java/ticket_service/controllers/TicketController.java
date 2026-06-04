@@ -12,7 +12,7 @@ import ticket_service.services.TicketService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ticket")
+@RequestMapping("/ticket-service/api/ticket")
 public class TicketController {
     private final TicketService ticketService;
 
