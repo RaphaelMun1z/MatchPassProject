@@ -86,9 +86,6 @@ public class VenueService {
     }
 
     private void validateDuplicatedVenue(CreateVenueRequestDTO dto) {
-        System.out.println(dto.name());
-        System.out.println(dto.city());
-        System.out.println(dto.state());
         venueRepository.findByNameAndCityAndState(
             dto.name(),
             dto.city(),

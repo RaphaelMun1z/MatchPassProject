@@ -9,7 +9,6 @@ import order_service.entities.Order;
 import order_service.entities.OrderItem;
 import order_service.entities.enums.OrderStatusEnum;
 import order_service.exceptions.models.NotFoundException;
-import order_service.repositories.OrderItemRepository;
 import order_service.repositories.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +19,9 @@ import java.util.List;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
+    public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
     }
 
     @Transactional
@@ -120,7 +117,7 @@ public class OrderService {
 
     public List<OrderSummaryResponseDTO> findOrdersByUserId(String userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
-        
+
         return orders.stream()
             .map(order -> new OrderSummaryResponseDTO(
                 order.getId(),

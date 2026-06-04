@@ -1,7 +1,6 @@
 package inventory_service.services;
 
 import feign.FeignException;
-import inventory_service.clients.CatalogServiceClient;
 import inventory_service.dtos.req.SeatReservationRequestDTO;
 import inventory_service.dtos.res.SeatResponseDTO;
 import inventory_service.dtos.res.SeatStatusResponseDTO;
@@ -10,6 +9,7 @@ import inventory_service.entities.enums.SeatStatusEnum;
 import inventory_service.environment.InstanceInformationService;
 import inventory_service.exceptions.models.BusinessException;
 import inventory_service.exceptions.models.NotFoundException;
+import inventory_service.proxy.EventCatalogProxy;
 import inventory_service.repositories.SeatLockRepository;
 import org.springframework.data.repository.core.support.RepositoryMethodInvocationListener;
 import org.springframework.stereotype.Service;
@@ -26,26 +26,24 @@ public class InventoryManagementService {
     private final InstanceInformationService informationService;
 
     private final SeatLockRepository seatLockRepository;
-    private final CatalogServiceClient catalogServiceClient;
-    private final RepositoryMethodInvocationListener repositoryMethodInvocationListener;
+    private final EventCatalogProxy eventCatalogProxy;
 
-    public InventoryManagementService(InstanceInformationService informationService, SeatLockRepository seatLockRepository, CatalogServiceClient catalogServiceClient, RepositoryMethodInvocationListener repositoryMethodInvocationListener) {
+    public InventoryManagementService(InstanceInformationService informationService, SeatLockRepository seatLockRepository, EventCatalogProxy eventCatalogProxy, RepositoryMethodInvocationListener repositoryMethodInvocationListener) {
         this.informationService = informationService;
         this.seatLockRepository = seatLockRepository;
-        this.catalogServiceClient = catalogServiceClient;
-        this.repositoryMethodInvocationListener = repositoryMethodInvocationListener;
+        this.eventCatalogProxy = eventCatalogProxy;
     }
 
     @Transactional
     public List<SeatStatusResponseDTO> createSeats(int seatsAmount, SeatReservationRequestDTO seatData) {
         try {
-            catalogServiceClient.validateEventSectorSeatCreating(
+            eventCatalogProxy.validateEventSectorSeatCreating(
                 seatData.eventId(),
                 seatData.sectorId(),
                 seatsAmount
             );
         } catch (FeignException.NotFound ex) {
-            throw new NotFoundException("A criação dos assentos não foi permitida.");
+            throw new NotFoundException("A criação dos assentos não foi permitida." + ex.getMessage());
         }
 
         List<SeatLock> newSeats = new ArrayList<>();
@@ -73,7 +71,7 @@ public class InventoryManagementService {
 
     public SeatStatusResponseDTO tryLockSeat(SeatReservationRequestDTO dto, String userId, String port) {
         try {
-            catalogServiceClient.validateEventSector(dto.eventId(), dto.sectorId());
+            eventCatalogProxy.validateEventSector(dto.eventId(), dto.sectorId());
         } catch (FeignException.NotFound ex) {
             throw new NotFoundException("A reserva dos assentos não foi permitida." + ex.getMessage());
         }

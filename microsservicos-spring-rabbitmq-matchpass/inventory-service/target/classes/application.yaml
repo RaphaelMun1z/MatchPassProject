@@ -9,10 +9,6 @@ spring:
   cloud:
     config:
       profile: dev
-  data:
-    redis:
-      host: localhost
-      port: 6379
 
 event-catalog:
   service:

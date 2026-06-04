@@ -48,10 +48,10 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findProcessBySeatTag(seatTag));
     }
 
-    @PatchMapping("/checkout/{orderId}")
+    @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderSummaryResponseDTO> updateProcessStatus(
         @PathVariable String orderId,
-        @RequestParam OrderStatusEnum status
+        @RequestBody OrderStatusEnum status
     ) {
         return ResponseEntity.ok(orderService.updateProcessStatus(orderId, status));
     }

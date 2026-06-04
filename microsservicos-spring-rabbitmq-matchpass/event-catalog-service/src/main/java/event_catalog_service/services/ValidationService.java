@@ -55,13 +55,18 @@ public class ValidationService {
         int seatsAmount
     ) {
         Optional<EventSectorDetailsDTO> eventSectorDetails = eventSectorPricingRepository.findEventSectorDetailsByEventIdAndSectorId(eventId, sectorId);
+        System.out.println("11111111111111111111111111");
         if (eventSectorDetails.isEmpty()) {
+            System.out.println("AAAAAAAAAAAAAAAAAAAAA");
             throw new NotFoundException("Setor não encontrado no evento.");
         }
 
         int totalCapacity = eventSectorDetails.get().totalCapacity();
         if (totalCapacity < seatsAmount) {
+            System.out.println("BBBBBBBBBBBBBBBBBB");
             throw new IllegalArgumentException("O setor informado possui capacidade máxima de " + totalCapacity + " assentos, enquanto voce solicitou a criação de " + seatsAmount + " assentos");
         }
+
+        System.out.println("CCCCCCCCCCCCCCCCCCCCC");
     }
 }

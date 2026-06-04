@@ -1,4 +1,4 @@
-package inventory_service.clients;
+package inventory_service.proxy;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
     name = "event-catalog-service",
     url = "${event-catalog.service.url}"
 )
-public interface CatalogServiceClient {
+public interface EventCatalogProxy {
     @GetMapping("/api/event/validate/v1/{eventId}/exists")
     void validateEvent(@PathVariable String eventId);
 
