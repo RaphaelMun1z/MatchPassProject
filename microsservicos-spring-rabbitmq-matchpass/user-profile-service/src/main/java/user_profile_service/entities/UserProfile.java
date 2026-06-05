@@ -16,7 +16,7 @@ public class UserProfile {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = true)
     private String document;
 
     public UserProfile() {
@@ -27,6 +27,11 @@ public class UserProfile {
         this.fullName = fullName;
         this.email = email;
         this.document = document;
+    }
+
+    public void updateFromJwt(String fullName, String email) {
+        if (fullName != null) this.fullName = fullName;
+        if (email != null) this.email = email;
     }
 
     public String getId() {

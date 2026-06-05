@@ -18,9 +18,14 @@ public class UserProfileService {
     @Transactional
     public UserProfileResponseDTO syncAndGetProfile(Jwt jwt) {
         String keycloakId = jwt.getSubject();
+        String email = extractEmail(jwt);
+        String fullName = extractFullName(jwt);
+        String document = jwt.getClaimAsString("cpf");
 
         UserProfile profile = repository.findById(keycloakId)
-            .orElseGet(() -> createNewProfileFromJwt(keycloakId, jwt));
+            .orElseGet(() -> repository.save(new UserProfile(keycloakId, fullName, email, document)));
+
+        profile.updateFromJwt(fullName, email);
 
         return new UserProfileResponseDTO(
             profile.getId(),
@@ -30,11 +35,25 @@ public class UserProfileService {
         );
     }
 
-    private UserProfile createNewProfileFromJwt(String id, Jwt jwt) {
-        String email = jwt.getClaimAsString("email");
+    private String extractFullName(Jwt jwt) {
         String name = jwt.getClaimAsString("name");
-        String document = jwt.getClaimAsString("cpf");
-        UserProfile newProfile = new UserProfile(id, name, email, document);
-        return repository.save(newProfile);
+        if (name != null && !name.isBlank()) return name;
+
+        String given = jwt.getClaimAsString("given_name");
+        String family = jwt.getClaimAsString("family_name");
+
+        if (given != null && family != null) return given + " " + family;
+        if (given != null) return given;
+        if (family != null) return family;
+
+        return "Usuário";
+    }
+
+    private String extractEmail(Jwt jwt) {
+        String email = jwt.getClaimAsString("email");
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Token sem claim de email — verifique o mapper no Keycloak");
+        }
+        return email;
     }
 }

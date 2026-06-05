@@ -28,3 +28,7 @@ springdoc:
   api-docs:
     path: /user-profile-service/v3/api-docs
   override-server-url: true
+
+user-profile-service:
+  token-generation:
+    url: ${TOKEN_GENERATION_URL}
