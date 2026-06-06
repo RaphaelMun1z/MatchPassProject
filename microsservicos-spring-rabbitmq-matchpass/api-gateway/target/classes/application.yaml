@@ -4,55 +4,5 @@ server:
 spring:
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      server:
-        webflux:
-          routes:
-            - id: inventory-service
-              uri: lb://inventory-service
-              predicates:
-                - Path=/inventory-service/**
-
-            - id: event-catalog-service
-              uri: lb://event-catalog-service
-              predicates:
-                - Path=/event-catalog-service/**
-
-            - id: order-service
-              uri: lb://order-service
-              predicates:
-                - Path=/order-service/**
-
-            - id: ticket-service
-              uri: lb://ticket-service
-              predicates:
-                - Path=/ticket-service/**
-
-            - id: notification-service
-              uri: lb://notification-service
-              predicates:
-                - Path=/notification-service/**
-
-eureka:
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
-
-springdoc:
-  swagger-ui:
-    urls:
-      - name: inventory-service
-        url: /inventory-service/v3/api-docs
-
-      - name: event-catalog-service
-        url: /event-catalog-service/v3/api-docs
-
-      - name: order-service
-        url: /order-service/v3/api-docs
-
-      - name: ticket-service
-        url: /ticket-service/v3/api-docs
-
-      - name: notification-service
-        url: /notification-service/v3/api-docs
+  config:
+    import: optional:configserver:http://localhost:8888
