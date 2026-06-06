@@ -1,10 +1,10 @@
 Fluxo Compra de Ingresso:
 
-1. Acessar o EventCatalogService e buscar por um evento/setor;
-2. Consultar no InventoryService a disponibilidade de assentos;
-3. Escolher um assento disponível via InventoryService;
-4. Bloquear assento temporariamente via InventoryService; 
-4.1. Gerar um pedido no OrderService;
+[OK] 1. Acessar o EventCatalogService e buscar por um evento/setor;
+[OK] 2. Consultar no InventoryService a disponibilidade de assentos;
+[OK] 3. Escolher um assento disponível via InventoryService;
+[OK] 4. Gerar um pedido no OrderService;
+[...] 4.1. Bloquear assento temporariamente via InventoryService; 
 4.2. Gerar sessão de pagamento no PaymentService;
 5. Realizar o pagamento no PaymentService;
 5.1. Alterar status do assento para vendido no InventoryService;

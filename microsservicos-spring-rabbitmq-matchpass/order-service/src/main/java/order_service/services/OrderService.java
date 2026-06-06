@@ -13,6 +13,8 @@ import order_service.exceptions.models.NotFoundException;
 import order_service.proxy.InventoryProxy;
 import order_service.proxy.SeatStatusResponseDTO;
 import order_service.repositories.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ import java.util.List;
 
 @Service
 public class OrderService {
+    private Logger logger = LoggerFactory.getLogger(OrderService.class);
+
     private final OrderRepository orderRepository;
 
     private final InventoryProxy inventoryProxy;
@@ -56,15 +60,20 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(newOrder);
 
+        logger.info("Antes do try");
         // Bloquear assento temporariamente
         try {
+            logger.info("Entrou no try");
             List<SeatStatusResponseDTO> seatsStatus = savedOrder.getItems()
                 .stream()
                 .map(orderItem -> inventoryProxy.tryLockSeat(orderItem.getSeatTag(), savedOrder.getUserId())).toList();
-            System.out.println(seatsStatus);
         } catch (FeignException.NotFound ex) {
-            throw new NotFoundException("Não foi possível realizar a reserva dos ingressos." + ex.getMessage());
+            logger.error(ex.getMessage());
+            throw new NotFoundException("Não foi possível realizar a reserva dos ingressos.");
+        } catch (Exception ex) {
+            logger.error("Outro erro: {}", ex.getMessage());
         }
+        logger.info("Depois do try");
 
         return new OrderSummaryResponseDTO(
             savedOrder.getId(),

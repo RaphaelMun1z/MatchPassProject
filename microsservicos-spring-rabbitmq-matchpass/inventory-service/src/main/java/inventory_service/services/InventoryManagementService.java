@@ -11,6 +11,8 @@ import inventory_service.exceptions.models.BusinessException;
 import inventory_service.exceptions.models.NotFoundException;
 import inventory_service.proxy.EventCatalogProxy;
 import inventory_service.repositories.SeatLockRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,8 @@ import java.util.List;
 
 @Service
 public class InventoryManagementService {
+    private Logger logger = LoggerFactory.getLogger(InventoryManagementService.class);
+
     private final InstanceInformationService informationService;
 
     private final SeatLockRepository seatLockRepository;
@@ -82,10 +86,16 @@ public class InventoryManagementService {
 
         String eventCatalogServicePort;
         try {
+            logger.info("Entrou no try");
             eventCatalogServicePort = eventCatalogProxy.validateEventSector(seat.getEventId(), seat.getSectorId());
         } catch (FeignException.NotFound ex) {
-            throw new NotFoundException("A reserva dos assentos não foi permitida." + ex.getMessage());
+            logger.error(ex.getMessage());
+            throw new NotFoundException("A reserva dos assentos não foi permitida.");
+        } catch (Exception ex) {
+            logger.error("Outro erro: {}", ex.getMessage());
+            throw new BusinessException("Ocorreu um erro interno.");
         }
+        logger.info("Depois do try");
 
         seat.lock(userId);
         SeatLock updatedSeat = seatLockRepository.save(seat);
