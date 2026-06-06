@@ -1,0 +1,9 @@
+server:
+  port: 8400
+
+spring:
+  application:
+    name: payment-service
+
+payment-service:
+  teste: "abacate"

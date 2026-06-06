@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="event-catalog-service" />
         <module name="inventory-service" />
+        <module name="payment-service" />
         <module name="spring-cloud-config-server" />
         <module name="api-gateway" />
         <module name="order-service" />
@@ -29,6 +30,7 @@
       <module name="naming-server" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
       <module name="spring-cloud-config-server" options="-parameters" />
       <module name="ticket-service" options="-parameters" />
       <module name="user-profile-service" options="-parameters" />

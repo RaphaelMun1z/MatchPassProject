@@ -1,0 +1,33 @@
+server:
+  port: 8400
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+spring:
+  application:
+    name: payment-service
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    config:
+      profile: dev
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  payment:
+    success-url: ${PAY_SUCCESS_URL}
+    cancel-url: ${PAY_CANCEL_URL}
+  subscription:
+    monthly-price-id: ${STRIPE_MONTHLY_PRICE_ID:price_1Tf8uZAR5269OShF91wG50Jf}
+    yearly-price-id: ${STRIPE_YEARLY_PRICE_ID:price_1Tf8vKAR5269OShFAxAFY5bq}
+
+springdoc:
+  api-docs:
+    path: /payment-service/v3/api-docs
+  override-server-url: true
