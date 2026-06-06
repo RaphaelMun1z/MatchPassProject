@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  user-profile-service-postgres-db:
+    image: postgres:18.4
+    restart: unless-stopped
+    container_name: postgresql-18.4-user-profile-service
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db_user_profile
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_user_profile_service_data:/var/lib/postgresql
+
   event-catalog-service-postgres-db:
     image: postgres:18.4
     restart: unless-stopped
@@ -10,7 +23,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db_event_catalog
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
       - postgres_event_catalog_service_data:/var/lib/postgresql
 
@@ -32,7 +45,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db_order
     ports:
-      - '5433:5432'
+      - '5434:5432'
     volumes:
       - postgres_order_service_data:/var/lib/postgresql
 
@@ -45,7 +58,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db_ticket
     ports:
-      - '5434:5432'
+      - '5435:5432'
     volumes:
       - postgres_ticket_service_data:/var/lib/postgresql
 
@@ -58,19 +71,6 @@ services:
     volumes:
       - mongodb_notification_service_data:/data/db
 
-  user-profile-service-postgres-db:
-    image: postgres:18.4
-    restart: unless-stopped
-    container_name: postgresql-18.4-user-profile-service
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: db_user_profile
-    ports:
-      - '5435:5432'
-    volumes:
-      - postgres_user_profile_service_data:/var/lib/postgresql
-
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.3
     container_name: keycloak-dev
@@ -82,9 +82,9 @@ services:
     command: start-dev
 
 volumes:
+  postgres_user_profile_service_data:
   postgres_event_catalog_service_data:
+  redis_inventory_service_data:
   postgres_order_service_data:
   postgres_ticket_service_data:
-  redis_inventory_service_data:
   mongodb_notification_service_data:
-  postgres_user_profile_service_data:

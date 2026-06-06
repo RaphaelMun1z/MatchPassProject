@@ -1,24 +1,14 @@
 server:
-  port: 8300
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+  port: 8500
 
 spring:
   application:
     name: ticket-service
   config:
     import: optional:configserver:http://localhost:8888
-  cloud:
-    config:
-      profile: dev
+  profiles:
+    active: dev
 
 springdoc:
   api-docs:
-    path: /ticket-service/v3/api-docs
-  override-server-url: true
+    path: /${spring.application.name}/v3/api-docs

@@ -1,0 +1,8 @@
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  payment:
+    success-url: ${PAY_SUCCESS_URL}
+    cancel-url: ${PAY_CANCEL_URL}
+  subscription:
+    monthly-price-id: ${STRIPE_MONTHLY_PRICE_ID:price_1Tf8uZAR5269OShF91wG50Jf}
+    yearly-price-id: ${STRIPE_YEARLY_PRICE_ID:price_1Tf8vKAR5269OShFAxAFY5bq}
