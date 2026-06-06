@@ -9,6 +9,13 @@ spring:
   profiles:
     active: dev
 
+feign:
+  client:
+    config:
+      inventory-service:
+        connectTimeout: 5000
+        readTimeout: 5000
+
 springdoc:
   api-docs:
     path: /${spring.application.name}/v3/api-docs

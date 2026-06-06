@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InventoryManagementService {
@@ -72,22 +71,20 @@ public class InventoryManagementService {
             )).toList();
     }
 
-    public SeatStatusResponseDTO tryLockSeat(SeatReservationRequestDTO dto, String userId) {
-        String eventCatalogServicePort;
-        try {
-            eventCatalogServicePort = eventCatalogProxy.validateEventSector(dto.eventId(), dto.sectorId());
-        } catch (FeignException.NotFound ex) {
-            throw new NotFoundException("A reserva dos assentos não foi permitida." + ex.getMessage());
-        }
-
-        Optional<SeatLock> existingLock = seatLockRepository.findById(dto.seatTag());
-
-        SeatLock seat = existingLock.orElseThrow(
+    public SeatStatusResponseDTO tryLockSeat(String seatTag, String userId) {
+        SeatLock seat = seatLockRepository.findBySeatTag(seatTag).orElseThrow(
             () -> new NotFoundException("Assento inexistente.")
         );
 
         if (seat.getStatus() != SeatStatusEnum.AVAILABLE) {
             throw new BusinessException("Assento indisponível");
+        }
+
+        String eventCatalogServicePort;
+        try {
+            eventCatalogServicePort = eventCatalogProxy.validateEventSector(seat.getEventId(), seat.getSectorId());
+        } catch (FeignException.NotFound ex) {
+            throw new NotFoundException("A reserva dos assentos não foi permitida." + ex.getMessage());
         }
 
         seat.lock(userId);

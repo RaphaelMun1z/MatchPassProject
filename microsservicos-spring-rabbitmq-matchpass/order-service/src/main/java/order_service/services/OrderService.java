@@ -1,5 +1,6 @@
 package order_service.services;
 
+import feign.FeignException;
 import order_service.dtos.req.CheckoutRequestDTO;
 import order_service.dtos.req.OrderItemRequestDTO;
 import order_service.dtos.res.OrderItemResponseDTO;
@@ -9,6 +10,8 @@ import order_service.entities.Order;
 import order_service.entities.OrderItem;
 import order_service.entities.enums.OrderStatusEnum;
 import order_service.exceptions.models.NotFoundException;
+import order_service.proxy.InventoryProxy;
+import order_service.proxy.SeatStatusResponseDTO;
 import order_service.repositories.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +23,11 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    private final InventoryProxy inventoryProxy;
+
+    public OrderService(OrderRepository orderRepository, InventoryProxy inventoryProxy) {
         this.orderRepository = orderRepository;
+        this.inventoryProxy = inventoryProxy;
     }
 
     @Transactional
@@ -49,6 +55,16 @@ public class OrderService {
         newOrder.addItems(newOrderItems);
 
         Order savedOrder = orderRepository.save(newOrder);
+
+        // Bloquear assento temporariamente
+        try {
+            List<SeatStatusResponseDTO> seatsStatus = savedOrder.getItems()
+                .stream()
+                .map(orderItem -> inventoryProxy.tryLockSeat(orderItem.getSeatTag(), savedOrder.getUserId())).toList();
+            System.out.println(seatsStatus);
+        } catch (FeignException.NotFound ex) {
+            throw new NotFoundException("Não foi possível realizar a reserva dos ingressos." + ex.getMessage());
+        }
 
         return new OrderSummaryResponseDTO(
             savedOrder.getId(),

@@ -62,10 +62,10 @@ springdoc:
       - name: user-profile-service
         url: /user-profile-service/v3/api-docs
 
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://localhost:8761/eureka
-#  instance:
-#    prefer-ip-address: true
-#    instance-id: ${spring.application.name}:${server.port}
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}

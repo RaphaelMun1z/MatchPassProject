@@ -27,9 +27,8 @@ public class InventoryManagementController implements InventoryManagementContrac
     }
 
     @Override
-    public ResponseEntity<SeatStatusResponseDTO> tryLockSeat(@PathVariable String eventId, @PathVariable String sectorId, @PathVariable String seatTag, @PathVariable String userId) {
-        SeatReservationRequestDTO dto = new SeatReservationRequestDTO(eventId, sectorId, seatTag);
-        return ResponseEntity.ok(inventoryManagementService.tryLockSeat(dto, userId));
+    public ResponseEntity<SeatStatusResponseDTO> tryLockSeat(@PathVariable String seatTag, @PathVariable String userId) {
+        return ResponseEntity.ok(inventoryManagementService.tryLockSeat(seatTag, userId));
     }
 
     @Override

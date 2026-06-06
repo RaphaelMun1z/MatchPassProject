@@ -27,12 +27,10 @@ public interface InventoryManagementContract {
 
     @Operation(summary = "Bloquear temporariamente um assento para um usuário")
     @PostMapping(
-        value = "/lock-seat/event/{eventId}/sector/{sectorId}/seat/{seatTag}/user/{userId}",
+        value = "/lock-seat/{seatTag}/user/{userId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<SeatStatusResponseDTO> tryLockSeat(
-        @PathVariable String eventId,
-        @PathVariable String sectorId,
         @PathVariable String seatTag,
         @PathVariable String userId
     );
